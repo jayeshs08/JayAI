@@ -5,10 +5,12 @@ import wikipedia
 import webbrowser
 import os
 import smtplib
+from googlesearch import search
+from AppOpener import open
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[0].id)
+engine.setProperty('voice', voices[1].id)
 
 def speak(audio):
     engine.say(audio)
@@ -17,17 +19,17 @@ def speak(audio):
 def greetings():
     hour = int(datetime.datetime.now().hour)
     if hour>=0 and hour<12:
-        speak("good morning")
+        speak("good morning sir, Jay A.I is active")
     elif hour>=12 and hour<18:
-        speak("good afternoon")
+        speak("good afternoon sir, Jay A.I is active")
     else:
-        speak("Good evening")
+        speak("Good evening sir, Jay A.I is active")
 
 def recieveCommands():
     r=sr.Recognizer()
     with sr.Microphone() as source:
         print("LISTENING......")
-        r.pause_threshold=1
+        r.pause_threshold=0.5
         audio = r.listen(source)
 
         try:
@@ -51,26 +53,15 @@ if __name__ == '__main__':
     greetings()
     while 1:
         query = recieveCommands().lower()
+        sites = [["youtube","https://www.youtube.com"], ["wikipedia", "https://www.wikipedia.com"],["google","https://www.google.co.in"],
+                 ["leetcode","https://www.leetcode.com"], ["github","https://www.github.com"], ["linkedin","https://www.linkedin.com"]]
 
-        if 'wikipedia' in query:
-            speak("searching on wikipedia...")
-            query=query.replace("wikipedia","")
-            results = wikipedia.summary(query,sentences=5)
-            speak("According to wikipedia")
-            speak(results)
-            print(results)
+        if "open" in query:
+            for site in sites:
+                if f"Open {site[0]}".lower() in query:
+                    speak(f"Opening {site[0]} right now sir.")
+                    webbrowser.open(site[1])
 
-        elif 'open youtube' in query:
-            webbrowser.open("youtube.com")
-        elif 'open google' in query:
-            webbrowser.open("google.com")
-        elif 'open leetcode' in query:
-            webbrowser.open("leetcode.com")
-        elif 'open soundcloud' in query:
-            webbrowser.open("soundcloud.com")
-        elif 'the time' in query:
-            curtime = datetime.datetime.now().strftime("%H:%M:%S")
-            speak(f"The time is {curtime}")
         elif 'email to jayesh' in query:
             try:
                 speak("What should i say?")
@@ -81,4 +72,15 @@ if __name__ == '__main__':
             except Exception as e:
                 print(e)
                 speak("Sorry sir. I couldn't send the E-Mail at the moment")
+
+        elif 'search' in query:
+            speak("These are the search results from Google.")
+            search(query, num_results=5)
+        elif 'the time' in query:
+            curtime = datetime.datetime.now().strftime("%H:%M:%S")
+            speak(f"Sir the time is {curtime}")
+        elif 'start telegram' in query:
+            speak("Opening telegram sir.")
+            open("telegram", throw_error=True)
+
 
