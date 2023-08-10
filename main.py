@@ -2,11 +2,13 @@ import pyttsx3
 import speech_recognition as sr
 import datetime
 import wikipedia
+import openai
 import webbrowser
 import os
 import smtplib
 from googlesearch import search
 from AppOpener import open
+from config import apikey
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -15,6 +17,29 @@ engine.setProperty('voice', voices[1].id)
 def speak(audio):
     engine.say(audio)
     engine.runAndWait()
+
+def openaiuse(prompt):
+    openai.api_key = apikey
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "Write a generic cover letter for me as a software engineer fresher."
+            },
+            {
+                "role": "user",
+                "content": ""
+            }
+        ],
+        temperature=1,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+    speak(response["choices"][0]["text"])
+    print(response["choices"][0]["text"])
 
 def greetings():
     hour = int(datetime.datetime.now().hour)
@@ -82,5 +107,9 @@ if __name__ == '__main__':
         elif 'start telegram' in query:
             speak("Opening telegram sir.")
             open("telegram", throw_error=True)
+
+        if "tell me" in query:
+            openaiuse(prompt=query)
+
 
 
